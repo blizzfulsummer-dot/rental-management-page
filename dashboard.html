@@ -127,7 +127,7 @@ let devices=[
   {id:2,homeId:2,name:"Pool Light",pin:4}
 ];
 
-let tenants=[
+let tenants = loadTenants() || [
   {id:1,name:"John Doe",email:"john@example.com",role:"Tenant", rent_amount:1000},
   {id:2,name:"Admin User",email:"admin@example.com",role:"Admin", rent_amount:2000}
 ];
