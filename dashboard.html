@@ -132,11 +132,8 @@ let devices=[
 
 let tenants = [];
 
-function init(){
-  tenants = loadTenants();
-}
-
 init();
+
 /*Pull Registered Tenant*/
 
 async function loadTenants() {
@@ -660,7 +657,11 @@ document.addEventListener("click",e=>{
 });
 
 /* INIT */
-renderDashboard();
+async function init(){
+  await loadTenants();
+  renderDashboard();
+}
+
 </script>
 </body>
 </html>
