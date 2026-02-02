@@ -116,6 +116,7 @@ footer{text-align:center;padding:1rem;color:var(--muted)}
 <script>
 /* ================= STATE ================= */
 const app = document.getElementById("app");
+const API_URL = "https://rental-management.ehexibit.com/api";
 
 let homes=[
   {id:1,name:"Main House"},
@@ -142,7 +143,7 @@ async function loadTenants() {
   }
 
   try {
-    const res = await fetch('/api/tenants', {
+    const res = await fetch(`${API_URL}/tenants`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
