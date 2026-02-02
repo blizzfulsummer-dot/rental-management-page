@@ -118,6 +118,8 @@ footer{text-align:center;padding:1rem;color:var(--muted)}
 const app = document.getElementById("app");
 const API_URL = "https://api.ehexibit.com/api";
 
+
+
 let homes=[
   {id:1,name:"Main House"},
   {id:2,name:"Beach Villa"}
@@ -128,10 +130,11 @@ let devices=[
   {id:2,homeId:2,name:"Pool Light",pin:4}
 ];
 
-let tenants = loadTenants() || [
-  {id:1,name:"John Doe",email:"john@example.com",role:"Tenant", rent_amount:1000},
-  {id:2,name:"Admin User",email:"admin@example.com",role:"Admin", rent_amount:2000}
-];
+let tenants = [];
+
+function init(){
+  tenants = loadTenants();
+}
 
 /*Pull Registered Tenant*/
 
