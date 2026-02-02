@@ -116,7 +116,7 @@ footer{text-align:center;padding:1rem;color:var(--muted)}
 <script>
 /* ================= STATE ================= */
 const app = document.getElementById("app");
-const API_URL = "https://rental-management.ehexibit.com/api";
+const API_URL = "https://api.ehexibit.com/api";
 
 let homes=[
   {id:1,name:"Main House"},
@@ -553,7 +553,7 @@ async function updatePassword() {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}` // ✅ pass token in header
+        "Authorization": `Bearer ${token}` //pass token in header
       },
       body: JSON.stringify({ oldPassword, newPassword }) // only password fields
     });
@@ -569,11 +569,12 @@ async function updatePassword() {
   }
 }
 
-
+/*
 function addTenant(){
   tenants.push({id:Date.now(),name:tName.value,email:tEmail.value,role:"Tenant"});
   renderTenantView();
-}
+}*/
+
 function deleteTenant(id){
   openModal("Delete tenant?",()=>{
     tenants=tenants.filter(t=>t.id!==id);
