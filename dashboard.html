@@ -142,7 +142,7 @@ async function loadTenants() {
   }
 
   try {
-    const res = await fetch('/tenants', {
+    const res = await fetch('/api/tenants', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
