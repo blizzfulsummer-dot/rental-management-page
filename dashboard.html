@@ -132,6 +132,40 @@ let tenants=[
   {id:2,name:"Admin User",email:"admin@example.com",role:"Admin", rent_amount:2000}
 ];
 
+/*Pull Registered Tenant*/
+
+async function loadTenants() {
+  const token = localStorage.getItem('accessToken');
+  if (!token) {
+    alert('Not authenticated');
+    return;
+  }
+
+  try {
+    const res = await fetch('/tenants', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    // Access token expired → trigger refresh flow
+    if (res.status === 401) {
+      await refreshAccessToken();
+      return loadTenants();
+    }
+
+    const data = await res.json();
+    tenants = data.tenants || [];
+
+    renderTenants();
+  } catch (err) {
+    console.error('Failed to load tenants', err);
+  }
+}
+
+
+
 let modalAction=null;
 
 /* ================= MODAL ================= */
