@@ -159,7 +159,7 @@ async function loadTenants() {
     const data = await res.json();
     tenants = data.tenants || [];
 
-    renderTenants();
+    renderTenantView();
   } catch (err) {
     console.error('Failed to load tenants', err);
   }
