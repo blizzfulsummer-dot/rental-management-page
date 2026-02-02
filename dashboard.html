@@ -68,7 +68,34 @@ footer{text-align:center;padding:1rem;color:var(--muted)}
 
 <header>
   <h1>🏠 ReMan</h1>
-  <div class="role">Admin</div>
+  <div style="position:relative;">
+    <button id="profileBtn" style="
+      padding:0.4rem 0.8rem;
+      border:none;
+      border-radius:12px;
+      background:#6366f1;
+      color:white;
+      cursor:pointer;
+      font-size:0.85rem;
+    ">Admin ▼</button>
+
+    <div id="profileDropdown" style="
+      display:none;
+      position:absolute;
+      right:0;
+      margin-top:0.5rem;
+      background:#fff;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      box-shadow:0 6px 12px rgba(0,0,0,.1);
+      width:160px;
+      z-index:100;
+    ">
+      <div class="dropdown-item" onclick="viewProfile()" style="padding:0.5rem 1rem; cursor:pointer;">Profile</div>
+      <div class="dropdown-item" onclick="updatePasswordForm()" style="padding:0.5rem 1rem; cursor:pointer;">Update password</div>
+      <div class="dropdown-item" onclick="confirmLogout()" style="padding:0.5rem 1rem; cursor:pointer; color:#ef4444;">Log Out</div>
+    </div>
+  </div>
 </header>
 
 <main id="app"></main>
@@ -90,35 +117,6 @@ footer{text-align:center;padding:1rem;color:var(--muted)}
 /* ================= STATE ================= */
 const app = document.getElementById("app");
 
-async function verifyUser() {
-  const accessToken = localStorage.getItem("accessToken");
-  const refreshToken = localStorage.getItem("refreshToken");
-
-  if (!accessToken) {
-    app.innerHTML = "<p style='color:red;'>No access token found. Please log in.</p>";
-    return;
-  }
-
-  try {
-    let res = await fetch(`${API_URL}/me`, {
-      headers: { "Authorization": `Bearer ${accessToken}` }
-    });
-
-    if (res.ok) {
-      const { user } = await res.json();
-      app.innerHTML = `<p style="color:green;">User verified: ${user.name} (${user.role})</p>`;
-    } else {
-      const data = await res.json();
-      app.innerHTML = `<p style="color:red;">Verification failed: ${data.error || res.status}</p>`;
-    }
-  } catch (err) {
-    app.innerHTML = `<p style="color:red;">Network or server error: ${err.message}</p>`;
-  }
-}
-
-// Run verification as soon as dashboard loads
-verifyUser(); 
-
 let homes=[
   {id:1,name:"Main House"},
   {id:2,name:"Beach Villa"}
@@ -137,12 +135,22 @@ let tenants=[
 let modalAction=null;
 
 /* ================= MODAL ================= */
+function openModal(msg, cb, okText = "OK") {
+  document.getElementById("modal-text").textContent = msg;
+  document.getElementById("modal").style.display = "flex";
+  modalAction = cb;
+  const okBtn = document.getElementById("modal-ok");
+  okBtn.textContent = okText;
+  okBtn.onclick = () => { cb(); closeModal(); };
+}
+
+/*
 function openModal(msg,cb){
   document.getElementById("modal-text").textContent=msg;
   document.getElementById("modal").style.display="flex";
   modalAction=cb;
   document.getElementById("modal-ok").onclick=()=>{cb();closeModal();}
-}
+}*/
 function closeModal(){
   document.getElementById("modal").style.display="none";
   modalAction=null;
@@ -200,7 +208,7 @@ function renderSettings(){
       ${homes.map(h=>`
         <tr><td>${h.name}</td>
         <td>
-            <button class="primary "onclick="renderEditHome(${h.id})">Edit</button>
+            <button onclick="renderEditHome(${h.id})">Edit</button>
             <button onclick="deleteHome(${h.id})">Delete</button></td></tr>`).join("")}
       </table>
       <input id="homeName" placeholder="Home name">
@@ -213,7 +221,7 @@ function renderSettings(){
       ${devices.map(d=>`
         <tr><td>${d.name}</td><td>${d.pin}</td>
         <td>
-            <button class="primary" onclick="renderEditDevice(${d.id})">Edit</button>
+            <button onclick="renderEditDevice(${d.id})">Edit</button>
             <button onclick="deleteDevice(${d.id})">Delete</button></td></tr>`).join("")}
       </table>
       <select id="devHome">${homes.map(h=>`<option value="${h.id}">${h.name}</option>`)}</select>
@@ -370,7 +378,7 @@ function setupRoleToggle() {
 
   radios.forEach(r => r.addEventListener("change", update));
 
-  update(); // 🔥 THIS is what you were missing
+  update();
 }
 
 
@@ -396,6 +404,37 @@ function addTenant() {
   tenants.push(data);
   renderTenantView();
 }
+
+const profileBtn = document.getElementById("profileBtn");
+const profileDropdown = document.getElementById("profileDropdown");
+
+profileBtn.addEventListener("click", () => {
+  profileDropdown.style.display = profileDropdown.style.display === "block" ? "none" : "block";
+});
+
+// Close dropdown if clicked outside
+document.addEventListener("click", (e) => {
+  if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+    profileDropdown.style.display = "none";
+  }
+});
+
+function confirmLogout() {
+  openModal("Are you sure you want to log out?", () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    window.location.href = "/login.html";
+  }, "Logout");
+}
+
+function viewProfile() {
+  alert("Profile page not implemented yet"); // replace with your actual profile render
+}
+
+function resetPasswordForm() {
+  alert("Reset password form not implemented yet"); // replace with your reset form render
+}
+
 
 /*
 function renderTenantForm(){
@@ -444,6 +483,55 @@ function renderEditTenant(id){
       </div>
     </div>
   `;
+}
+
+function updatePasswordForm() {
+  app.innerHTML += `
+    <div id="passwordModalOverlay" class="modal-overlay" style="display:flex;align-items:center;justify-content:center;">
+      <div class="modal">
+        <h3>Update Password</h3>
+        <input id="oldPassword" type="password" placeholder="Old Password" style="width:100%;margin:0.5rem 0;padding:0.5rem;border-radius:8px;border:1px solid #e5e7eb;">
+        <input id="newPassword" type="password" placeholder="New Password" style="width:100%;margin:0.5rem 0;padding:0.5rem;border-radius:8px;border:1px solid #e5e7eb;">
+        <input id="confirmPassword" type="password" placeholder="Confirm New Password" style="width:100%;margin:0.5rem 0;padding:0.5rem;border-radius:8px;border:1px solid #e5e7eb;">
+        <div class="modal-buttons" style="margin-top:1rem">
+          <button onclick="document.getElementById('passwordModalOverlay').remove()">Cancel</button>
+          <button class="primary" onclick="updatePassword()">Update</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function updatePassword() {
+  const oldPassword = document.getElementById("oldPassword").value.trim();
+  const newPassword = document.getElementById("newPassword").value.trim();
+  const confirmPassword = document.getElementById("confirmPassword").value.trim();
+
+  if (!oldPassword || !newPassword || !confirmPassword) return alert("All fields are required");
+  if (newPassword !== confirmPassword) return alert("New passwords do not match");
+
+  const token = localStorage.getItem("accessToken");
+  if (!token) return alert("You are not logged in");
+
+  try {
+    const res = await fetch(`${API_URL}/update_password`, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}` // ✅ pass token in header
+      },
+      body: JSON.stringify({ oldPassword, newPassword }) // only password fields
+    });
+
+    const data = await res.json();
+    if (!res.ok) return alert(data.error || "Error updating password");
+
+    alert("Password updated successfully!");
+    document.getElementById('passwordModalOverlay').remove();
+  } catch (err) {
+    console.error(err);
+    alert("An error occurred. Try again.");
+  }
 }
 
 
@@ -526,9 +614,6 @@ function updateDevice(id){
 
   renderSettings();
 }
-
-
-
 
 /* ================= TOGGLE ================= */
 document.addEventListener("click",e=>{
