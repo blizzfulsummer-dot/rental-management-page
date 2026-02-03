@@ -462,9 +462,9 @@ async function addTenant() {
   const email = tEmail.value.trim();
   if (!name || !email) return alert("Name and Email are required");
 
-  const data = { name, email, role: role.toLowerCase() }; // backend expects lowercase role
+  const data = { name, email, role: role.toLowerCase() };
 
-  // Include tenant-only fields if role is tenant
+  // Tenant-only fields
   if (role === "Tenant") {
     const rentAmount = Number(rent_amount.value || 0);
     const depositAmount = Number(deposit.value || 0);
@@ -483,7 +483,7 @@ async function addTenant() {
     data.billing_cycle = billingCycle;
   }
 
-  // Include admin code if role is Admin
+  // Admin code
   if (role === "Admin") {
     const code = prompt("Enter registration code for admin account:");
     if (!code) return alert("Admin registration code is required");
@@ -491,7 +491,7 @@ async function addTenant() {
   }
 
   try {
-    const token = localStorage.getItem('accessToken'); // for admin creating tenant/user
+    const token = localStorage.getItem('accessToken');
     const res = await fetch(`${API_URL}/signup`, {
       method: "POST",
       headers: {
@@ -504,15 +504,20 @@ async function addTenant() {
     const result = await res.json();
     if (!res.ok) return alert(result.error || "Registration failed");
 
-    alert("User registered successfully" + (result.tempPassword ? `\nTemp Password: ${result.tempPassword}` : ""));
+    // Show temporary password if available
+    let message = "User registered successfully!";
+    if (result.tempPassword) {
+      message += `\nTemporary Password: ${result.tempPassword}`;
+      message += `\nPlease copy this password and share it securely with the user.`;
+    }
+    alert(message);
 
-    // Reload tenants if applicable
+    // Reload tenant list if applicable
     if (role === "Tenant" || role === "User") {
       await loadTenants();
       renderTenantView();
     } else {
-      // for admin self-registration, maybe redirect to login
-      window.location.href = "/login.html";
+      window.location.href = "/login.html"; // for self-registered admin
     }
 
   } catch (err) {
@@ -520,6 +525,7 @@ async function addTenant() {
     alert("Error registering user");
   }
 }
+
 
 
 const profileBtn = document.getElementById("profileBtn");
