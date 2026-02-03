@@ -350,7 +350,7 @@ function renderTenantView() {
             <td>${t.rent_amount ? "₱" + t.rent_amount : "-"}</td>
             <td>${t.balance ? "₱" + t.balance : "-"}</td>
             <td>${t.onboard_date || "-"}</td>
-            <td>${t.role}</td>
+            <td>${u.role}</td>
             <td>
               <button class="primary" onclick="renderEditTenant(${t.id})">&nbsp;Edit &#9745;</button>
               <button onclick="deleteTenant(${t.id})">Delete</button>
@@ -454,28 +454,73 @@ function setupRoleToggle() {
 }
 
 
-function addTenant() {
+async function addTenant() {
   const role = document.querySelector('input[name="role"]:checked')?.value;
   if (!role) return alert("Select role");
 
-  const data = {
-    id: Date.now(),
-    name: tName.value,
-    email: tEmail.value,
-    role
-  };
+  const name = tName.value.trim();
+  const email = tEmail.value.trim();
+  if (!name || !email) return alert("Name and Email are required");
 
+  const data = { name, email, role: role.toLowerCase() }; // backend expects lowercase role
+
+  // Include tenant-only fields if role is tenant
   if (role === "Tenant") {
-    data.rent_amount = Number(rent_amount.value || 0);
-    data.balance = Number(balance.value || 0);
-    data.onboard_date = onboard_date.value;
-    data.billing_cycle =
+    const rentAmount = Number(rent_amount.value || 0);
+    const depositAmount = Number(deposit.value || 0);
+    const balanceAmount = Number(balance.value || 0);
+    const onboardDate = onboard_date.value;
+    const billingCycle =
       document.querySelector('input[name="billing_cycle"]:checked')?.value || "monthly";
+
+    if (!rentAmount || !balanceAmount || !onboardDate)
+      return alert("Please fill all tenant-specific fields");
+
+    data.rent_amount = rentAmount;
+    data.deposit = depositAmount;
+    data.balance = balanceAmount;
+    data.onboard_date = onboardDate;
+    data.billing_cycle = billingCycle;
   }
 
-  tenants.push(data);
-  renderTenantView();
+  // Include admin code if role is Admin
+  if (role === "Admin") {
+    const code = prompt("Enter registration code for admin account:");
+    if (!code) return alert("Admin registration code is required");
+    data.code = code;
+  }
+
+  try {
+    const token = localStorage.getItem('accessToken'); // for admin creating tenant/user
+    const res = await fetch(`${API_URL}/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await res.json();
+    if (!res.ok) return alert(result.error || "Registration failed");
+
+    alert("User registered successfully" + (result.tempPassword ? `\nTemp Password: ${result.tempPassword}` : ""));
+
+    // Reload tenants if applicable
+    if (role === "Tenant" || role === "User") {
+      await loadTenants();
+      renderTenantView();
+    } else {
+      // for admin self-registration, maybe redirect to login
+      window.location.href = "/login.html";
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert("Error registering user");
+  }
 }
+
 
 const profileBtn = document.getElementById("profileBtn");
 const profileDropdown = document.getElementById("profileDropdown");
