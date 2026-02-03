@@ -402,8 +402,8 @@ function renderTenantForm(){
         </label>
       </div>
 
-      <input id="name" placeholder="Name">
-      <input id="email" placeholder="Email">
+      <input id="tName" placeholder="Name">
+      <input id="tEmail" placeholder="Email">
 
       <!-- Tenant-only fields (hidden by default) -->
       <div id="tenant-fields" style="display:none;margin-top:1rem">
@@ -473,6 +473,7 @@ async function addTenant() {
     const onboardDate = onboard_date.value;
     const billingCycle =
       document.querySelector('input[name="billing_cycle"]:checked')?.value || "monthly";
+    const leaseUnit = lease_unit.value || "Matanzas"
 
     if (!rentAmount || !balanceAmount || !onboardDate)
       return alert("Please fill all tenant-specific fields");
@@ -482,6 +483,7 @@ async function addTenant() {
     data.balance = balanceAmount;
     data.onboard_date = onboardDate;
     data.billing_cycle = billingCycle;
+    data.lease_unit = leaseUnit;
   }
 
   // Admin code
