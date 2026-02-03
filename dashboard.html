@@ -63,9 +63,10 @@ button.primary{background:var(--primary);color:#fff;border:none}
   display: none;
   align-items: center;
   justify-content: center;
-  padding: 1rem;          /* important for mobile */
-  z-index: 999;
+  padding: 1rem;
+  z-index: 2147483647; /* 🔥 escape everything */
 }
+
 .modal{
   background: #fff;
   padding: 1.5rem;
@@ -81,6 +82,17 @@ button.primary{background:var(--primary);color:#fff;border:none}
   .modal{
     border-radius: 14px;
   }
+}
+
+body{
+  position: relative;
+  overflow-x: hidden;
+}
+
+
+.table-wrapper{
+  overflow-x: auto;
+  position: relative; /* prevents stacking bugs */
 }
 
 footer{text-align:center;padding:1rem;color:var(--muted)}
@@ -317,6 +329,7 @@ function deleteDevice(id){
 function renderTenantView() {
   app.innerHTML = `
     <div class="nav-back" onclick="renderDashboard()">← Back</div>
+    <div class="table-wrapper">
     <table class="tenant-table">
       <thead>
         <tr>
@@ -346,6 +359,7 @@ function renderTenantView() {
         `).join("")}
       </tbody>
     </table>
+    </div>
   `;
 }
 
