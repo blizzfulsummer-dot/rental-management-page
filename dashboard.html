@@ -486,6 +486,8 @@ async function addTenant() {
     data.leased_unit = leaseUnit;
   }
 
+  console.log(data);
+  
   // Admin code
   if (role === "Admin") {
     const code = prompt("Enter registration code for admin account:");
