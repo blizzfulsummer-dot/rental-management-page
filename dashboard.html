@@ -542,6 +542,30 @@ document.addEventListener("click", (e) => {
   }
 });
 
+function showInfoModal(title, message, okText = "OK") {
+  // Create modal elements
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.style.display = "flex";
+
+  const modal = document.createElement("div");
+  modal.className = "modal";
+
+  modal.innerHTML = `
+    <h3>${title}</h3>
+    <p style="word-break:break-word">${message}</p>
+    <div class="modal-buttons" style="margin-top:1rem">
+      <button class="primary">${okText}</button>
+    </div>
+  `;
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  modal.querySelector("button").onclick = () => overlay.remove();
+}
+
+
 function confirmLogout() {
   openModal("Are you sure you want to log out?", () => {
     localStorage.removeItem("accessToken");
