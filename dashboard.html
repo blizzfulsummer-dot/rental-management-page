@@ -56,8 +56,25 @@ button{cursor:pointer}
 button.primary{background:var(--primary);color:#fff;border:none}
 
 /* Modal */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:99}
-.modal{background:#fff;padding:1.5rem;border-radius:16px;width:320px}
+.modal-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;          /* important for mobile */
+  z-index: 999;
+}
+.modal{
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 360px;       /* keeps desktop size */
+  max-height: 90vh;       /* prevents overflow */
+  overflow-y: auto;       /* scroll if content is long */
+}
 .modal-buttons{display:flex;justify-content:flex-end;gap:.5rem}
 
 footer{text-align:center;padding:1rem;color:var(--muted)}
