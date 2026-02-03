@@ -350,7 +350,7 @@ function renderTenantView() {
             <td>${t.rent_amount ? "₱" + t.rent_amount : "-"}</td>
             <td>${t.balance ? "₱" + t.balance : "-"}</td>
             <td>${t.onboard_date || "-"}</td>
-            <td>${u.role}</td>
+            <td>${t.role}</td>
             <td>
               <button class="primary" onclick="renderEditTenant(${t.id})">&nbsp;Edit &#9745;</button>
               <button onclick="deleteTenant(${t.id})">Delete</button>
